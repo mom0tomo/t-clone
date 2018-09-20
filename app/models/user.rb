@@ -25,4 +25,9 @@ class User < ApplicationRecord
   def following?(other_user)
     self.followings.include?(other_user)
   end
+
+  def timeline_posts
+    # following_idsはUserモデルの has_many :followings, ... によって自動的に生成されるメソッド
+    Post.where(user_id: [self.id] + self.following_ids)
+  end
 end
