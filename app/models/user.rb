@@ -1,9 +1,14 @@
 class User < ApplicationRecord
   has_many :posts
+
   has_many :relationships # UserからRelationshipを取得するときはuser_idを使う
   has_many :followings, through: :relationships, source: :follow # リレーションの名前, 中間テーブル, 中間テーブルのカラムの中で参照先とするid
+
   has_many :reverses_of_relationship, class_name: 'Relationship', foreign_key: 'follow_id' # RelationshipからUserを取得するときはfollow_idを使う
   has_many :followers, through: :reverses_of_relationship, source: :user
+
+  has_many :likes
+  has_many :like_posts, through: :likes, source: :post
 
   before_save { self.email.downcase! }
   validates :name, presence: true, length: { maximum: 50 }
@@ -29,5 +34,18 @@ class User < ApplicationRecord
   def timeline_posts
     # following_idsはUserモデルの has_many :followings, ... によって自動的に生成されるメソッド
     Post.where(user_id: [self.id] + self.following_ids)
+  end
+
+  def like(post)
+    self.likes.find_or_create_by(post_id: post.id)
+  end
+
+  def unlike(post)
+    like = self.likes.find_by(post_id: post.id)
+    like.destroy if like
+  end
+
+  def like?(post)
+    self.like_posts.include?(post)
   end
 end

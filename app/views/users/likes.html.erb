@@ -17,6 +17,6 @@
       <li class="<%= 'active' if current_page?(followings_user_path(@user)) %>"><%= link_to followings_user_path(@user) do %>Followings<% end %></li>
       <li class="<%= 'active' if current_page?(followers_user_path(@user)) %>"><%= link_to followers_user_path(@user) do %>Followers<% end %></li>
     </ul>
-    <%= render 'users', users: @followers %>
+    <%= render 'posts/posts', posts: @like_posts %>
   </div>
 </div>
